@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "117310633222",
+    "project_id": "diu-bus-9f02d",
+    "storage_bucket": "diu-bus-9f02d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:117310633222:android:93b6321a8932ca055dda87",
+        "android_client_info": {
+          "package_name": "com.resoftltd.diubus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "117310633222-e25heefmor8142v8dg3f3q7d68uup2oa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuLHFTPPVxFX7-VL-5feiR8Gy2InjSPtk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "117310633222-e25heefmor8142v8dg3f3q7d68uup2oa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

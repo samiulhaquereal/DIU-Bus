@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_share_Location"
+            android:icon="@drawable/share_location"
+            android:title="Start sharing location" />
+        <item
+            android:id="@+id/nav_stop_Location"
+            android:icon="@drawable/stop_location"
+            android:title="Stop sharing location" />
+        <item
+            android:id="@+id/nav_signout"
+            android:icon="@drawable/signouticon"
+            android:title="SignOut" />
+    </group>
+</menu>

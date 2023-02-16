@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">DIU Bus</string>
+    <string name="Colse">Close</string>
+    <string name="Open">Open</string>
+    <string name="google_maps_key">Open</string>
+
+</resources>
