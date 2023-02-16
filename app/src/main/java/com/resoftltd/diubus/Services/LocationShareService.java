@@ -1,9 +1,5 @@
 package com.resoftltd.diubus.Services;
 
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-
 import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -14,11 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,7 +22,9 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -112,7 +108,7 @@ public class LocationShareService extends Service implements LocationListener, G
         ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(654321, this.builder.build());
     }
 
-    @Override // com.google.android.gms.location.LocationListener
+    @Override
     public void onLocationChanged(Location location) {
         this.latLngCurrent = new LatLng(location.getLatitude(), location.getLongitude());
         shareLocation();
@@ -121,8 +117,8 @@ public class LocationShareService extends Service implements LocationListener, G
     public void shareLocation() {
         try {
             this.reference.child(this.user.getUid()).child("lat").setValue(String.valueOf(this.latLngCurrent.latitude));
-            this.reference.child(this.user.getUid()).child("lng").setValue(String.valueOf(this.latLngCurrent.longitude)).addOnCompleteListener(new OnCompleteListener<Void>() { // from class: com.haroonfazal.haroonapps.bustracker.Services.LocationShareService.1
-                @Override // com.google.android.gms.tasks.OnCompleteListener
+            this.reference.child(this.user.getUid()).child("lng").setValue(String.valueOf(this.latLngCurrent.longitude)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
                         return;

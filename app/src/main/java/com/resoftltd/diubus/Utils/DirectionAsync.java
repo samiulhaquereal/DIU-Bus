@@ -35,7 +35,6 @@ public class DirectionAsync extends AsyncTask<Object, String, String> {
         this.c = context;
     }
 
-    /* JADX INFO: Access modifiers changed from: protected */
     @Override // android.os.AsyncTask
     public String doInBackground(Object... objArr) {
         this.mMap = (GoogleMap) objArr[0];

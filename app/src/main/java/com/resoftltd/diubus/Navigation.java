@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -21,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -31,6 +29,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
@@ -69,7 +68,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class Navigation extends AppCompatActivity {
+public class Navigation extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener, GoogleMap.OnMarkerClickListener, ResultCallback {
     FirebaseAuth auth;
     GoogleApiClient client;
     HashMap<String, Marker> hashMap;
@@ -91,17 +90,15 @@ public class Navigation extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
-
-        Toolbar toolbarc = findViewById(R.id.toolbar);
-
-        setSupportActionBar(toolbarc);
+        //Toolbar toolbarc = findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbarc);
 
 
         auth = FirebaseAuth.getInstance();
         requestQueue = Volley.newRequestQueue(this);
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbarc, R.string.Open, R.string.Colse);
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Colse);
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -113,6 +110,7 @@ public class Navigation extends AppCompatActivity {
         textEmail = (TextView) headerView.findViewById(R.id.email_text);
 
         ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync((OnMapReadyCallback) this);
+
         referenceDrivers = FirebaseDatabase.getInstance().getReference().child("Drivers");
         referenceUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         scheduleReference = FirebaseDatabase.getInstance().getReference().child("uploads").child("0");
@@ -124,7 +122,8 @@ public class Navigation extends AppCompatActivity {
                 if (dataSnapshot.child(currentUser.getUid()).child("lat").exists()) {
                     driver_profile = true;
                     //textName.setText((String) dataSnapshot.child(currentUser.getUid()).child(AppMeasurementSDK.ConditionalUserProperty.NAME).getValue(String.class));
-                    textEmail.setText((String) dataSnapshot.child(currentUser.getUid()).child("email").getValue(String.class));
+                    textName.setText(dataSnapshot.child(currentUser.getUid()).child("name").getValue(String.class));
+                    textEmail.setText(dataSnapshot.child(currentUser.getUid()).child("email").getValue(String.class));
                     navigationView.getMenu().clear();
                     navigationView.inflateMenu(R.menu.driver_menu);
                     return;
@@ -136,25 +135,26 @@ public class Navigation extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot2) {
                         FirebaseUser currentUser2 = auth.getCurrentUser();
                         //textName.setText((String) dataSnapshot2.child(currentUser2.getUid()).child(AppMeasurementSdk.ConditionalUserProperty.NAME).getValue(String.class));
-                        textEmail.setText((String) dataSnapshot2.child(currentUser2.getUid()).child("email").getValue(String.class));
+                        textName.setText(dataSnapshot2.child(currentUser2.getUid()).child("name").getValue(String.class));
+                        textEmail.setText(dataSnapshot2.child(currentUser2.getUid()).child("email").getValue(String.class));
                         FirebaseMessaging.getInstance().subscribeToTopic("news");
                         navigationView.getMenu().clear();
                         navigationView.inflateMenu(R.menu.user_menu);
                     }
 
-                    @Override // com.google.firebase.database.ValueEventListener
+                    @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Toast.makeText(getApplicationContext(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
 
-            @Override // com.google.firebase.database.ValueEventListener
+            @Override
             public void onCancelled(DatabaseError databaseError) {
                 Toast.makeText(getApplicationContext(), databaseError.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-        this.referenceDrivers.addChildEventListener(new ChildEventListener() {
+        referenceDrivers.addChildEventListener(new ChildEventListener() {
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
@@ -172,8 +172,8 @@ public class Navigation extends AppCompatActivity {
                 try {
                     LatLng latLng = new LatLng(Double.parseDouble((String) dataSnapshot.child("lat").getValue(String.class)), Double.parseDouble((String) dataSnapshot.child("lng").getValue(String.class)));
                     MarkerOptions markerOptions = new MarkerOptions();
-                    //markerOptions.title((String) dataSnapshot.child(AppMeasurementSdk.ConditionalUserProperty.NAME).getValue(String.class));
-                    markerOptions.snippet("Van number: " + ((String) dataSnapshot.child("vehiclenumber").getValue(String.class)));
+                    markerOptions.title(dataSnapshot.child("name").getValue(String.class));
+                    markerOptions.snippet("Van number: " + (dataSnapshot.child("vehiclenumber").getValue(String.class)));
                     markerOptions.position(latLng);
                     markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.busicon));
                     Marker addMarker = mMap.addMarker(markerOptions);
@@ -183,11 +183,11 @@ public class Navigation extends AppCompatActivity {
                 }
             }
 
-            @Override // com.google.firebase.database.ChildEventListener
+            @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String str) {
                 try {
                     //String obj = dataSnapshot.child(AppMeasurementSdk.ConditionalUserProperty.NAME).getValue().toString();
-                    String obj = dataSnapshot.child("vehiclenumber").getValue().toString();
+                    String obj = dataSnapshot.child("name").getValue().toString();
                     String obj2 = dataSnapshot.child("lat").getValue().toString();
                     String obj3 = dataSnapshot.child("lng").getValue().toString();
                     updateLatLng = new LatLng(Double.parseDouble(obj2), Double.parseDouble(obj3));
@@ -202,22 +202,24 @@ public class Navigation extends AppCompatActivity {
         });
     }
 
+
     public void onMapReady(GoogleMap googleMap) {
-        this.mMap = googleMap;
-        this.mMap.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) this);
-        this.client = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addOnConnectionFailedListener((GoogleApiClient.OnConnectionFailedListener) this).addConnectionCallbacks((GoogleApiClient.ConnectionCallbacks) this).build();
-        this.client.connect();
+        mMap = googleMap;
+        mMap.setOnMarkerClickListener(this);
+        client = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addOnConnectionFailedListener(this).addConnectionCallbacks(this).build();
+        client.connect();
     }
 
     public boolean onMarkerClick(Marker marker) {
         LatLng position = marker.getPosition();
         String format = new DecimalFormat("#.##").format(CalculationByDistance(this.latLngCurrentuserLocation, position));
         Toast.makeText(this, format + " KM far.", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, " "+position.latitude+" "+position.longitude, Toast.LENGTH_SHORT).show();
         StringBuilder sb = new StringBuilder();
         sb.append("https://maps.googleapis.com/maps/api/directions/json?");
         sb.append("origin=" + position.latitude + "," + position.longitude);
         sb.append("&destination=" + this.latLngCurrentuserLocation.latitude + "," + this.latLngCurrentuserLocation.longitude);
-        sb.append("&key=AIzaSyCsThl1-hAeG2EscPb69ii0hdSXkUJ6-x0");
+        sb.append("&key=AIzaSyDPqeShdSvznztq8n8Y0RZTMdm_BE9Ks88");
         new DirectionAsync(getApplicationContext()).execute(this.mMap, sb.toString(), new LatLng(position.latitude, position.longitude), new LatLng(this.latLngCurrentuserLocation.latitude, this.latLngCurrentuserLocation.longitude), marker);
         return true;
     }
@@ -308,7 +310,7 @@ public class Navigation extends AppCompatActivity {
         builder.setMessage("Enter your notification details");
         builder.setTitle("Send Notifications");
         builder.setView(linearLayout);
-        builder.setPositiveButton("Send", new DialogInterface.OnClickListener() { // from class: com.haroonfazal.haroonapps.bustracker.Activities.NavigationActivity.3
+        builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
             @Override // android.content.DialogInterface.OnClickListener
             public void onClick(DialogInterface dialogInterface, int i) {
                 try {
@@ -318,7 +320,7 @@ public class Navigation extends AppCompatActivity {
                 }
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() { // from class: com.haroonfazal.haroonapps.bustracker.Activities.NavigationActivity.4
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override // android.content.DialogInterface.OnClickListener
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
@@ -327,7 +329,7 @@ public class Navigation extends AppCompatActivity {
         builder.show();
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
+
     public void sendFcm(String str, String str2) throws JSONException {
         JSONObject jSONObject = new JSONObject();
         jSONObject.put("to", "/topics/news");
@@ -335,10 +337,10 @@ public class Navigation extends AppCompatActivity {
         jSONObject2.put("title", str);
         jSONObject2.put("body", str2);
         jSONObject.put("notification", jSONObject2);
-        this.requestQueue.add(new JsonObjectRequest(1, "https://fcm.googleapis.com/fcm/send", jSONObject, new Response.Listener<JSONObject>() { // from class: com.haroonfazal.haroonapps.bustracker.Activities.NavigationActivity.5
-            @Override // com.android.volley.Response.Listener
+        this.requestQueue.add(new JsonObjectRequest(1, "https://fcm.googleapis.com/fcm/send", jSONObject, new Response.Listener<JSONObject>() {
+            @Override
             public void onResponse(JSONObject jSONObject3) {
-                Log.d("response", jSONObject3.toString());
+                //Log.d("response", jSONObject3.toString());
             }
         }, new Response.ErrorListener() {
             @Override
@@ -351,7 +353,7 @@ public class Navigation extends AppCompatActivity {
             public Map<String, String> getHeaders() {
                 HashMap hashMap = new HashMap();
                 hashMap.put("content-type", "application/json");
-                hashMap.put("authorization", "key=AIzaSyB9PCayi2q5kN7R0bS8l7Ykk5YbQyfG2Fw");
+                hashMap.put("authorization", "key=AIzaSyDPqeShdSvznztq8n8Y0RZTMdm_BE9Ks88");
                 return hashMap;
             }
         });
@@ -381,6 +383,11 @@ public class Navigation extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
     public void onLocationChanged(Location location) {
         LocationServices.FusedLocationApi.removeLocationUpdates(this.client, (LocationListener) this);
         if (location == null) {
@@ -405,4 +412,8 @@ public class Navigation extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }

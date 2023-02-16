@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
         }
         startActivity(new Intent(this, Navigation.class));
         finish();
-        //startActivity(new Intent(this, DriverRegistrationActivity.class));
 
     }
     public void registerAsUser(View view) {

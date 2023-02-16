@@ -6,12 +6,6 @@
     android:background="@color/black"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/driverToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/teal_200"
-        app:titleTextColor="#ffffff" />
 
     <LinearLayout
         android:id="@+id/linearLayout"

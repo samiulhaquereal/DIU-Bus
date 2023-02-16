@@ -73,7 +73,7 @@ public class DriverRegistrationActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    Driver driver = new Driver(editTextDriverName.getText().toString(), editTextDriverEmail.getText().toString(), editTextDriverPassword.getText().toString(), editTextDriverBus.getText().toString(), "33.652037", "73.156598");
+                    Driver driver = new Driver(editTextDriverName.getText().toString(), editTextDriverEmail.getText().toString(), editTextDriverPassword.getText().toString(), editTextDriverBus.getText().toString(), "24.886436", "91.880722");
                     DriverRegistrationActivity driverRegistrationActivity = DriverRegistrationActivity.this;
                     driverRegistrationActivity.user = driverRegistrationActivity.auth.getCurrentUser();
                     DriverRegistrationActivity.this.databaseReference = FirebaseDatabase.getInstance().getReference().child("Drivers").child(user.getUid());
@@ -81,23 +81,23 @@ public class DriverRegistrationActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task2) {
                             if (task2.isSuccessful()) {
-                                DriverRegistrationActivity.this.dialog.dismiss();
+                                dialog.dismiss();
                                 Toast.makeText(DriverRegistrationActivity.this, "Account created successfully", Toast.LENGTH_SHORT).show();
-                                DriverRegistrationActivity.this.finish();
+                                finish();
                                 Intent intent = new Intent(DriverRegistrationActivity.this, Navigation.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                DriverRegistrationActivity.this.startActivity(intent);
+                                startActivity(intent);
                                 return;
                             }
                             Toast.makeText(DriverRegistrationActivity.this, "Could not register driver", Toast.LENGTH_LONG).show();
-                            DriverRegistrationActivity.this.dialog.dismiss();
+                            dialog.dismiss();
                         }
                     });
                     return;
                 }
                 DriverRegistrationActivity driverRegistrationActivity2 = DriverRegistrationActivity.this;
                 Toast.makeText(driverRegistrationActivity2, "Could not register. " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                DriverRegistrationActivity.this.dialog.dismiss();
+                dialog.dismiss();
             }
         });
     }
