@@ -1,18 +1,5 @@
 package com.resoftltd.diubus;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
@@ -29,17 +16,28 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -61,6 +59,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.resoftltd.diubus.Services.LocationShareService;
+import com.resoftltd.diubus.Utils.DirectionAsync;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -92,6 +91,7 @@ public class Navigation extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
+
         Toolbar toolbarc = findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbarc);
@@ -109,21 +109,21 @@ public class Navigation extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) this);
 
         View headerView = navigationView.getHeaderView(0);
-        this.textName = (TextView) headerView.findViewById(R.id.title_text);
-        this.textEmail = (TextView) headerView.findViewById(R.id.email_text);
+        textName = (TextView) headerView.findViewById(R.id.title_text);
+        textEmail = (TextView) headerView.findViewById(R.id.email_text);
 
         ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync((OnMapReadyCallback) this);
-        this.referenceDrivers = FirebaseDatabase.getInstance().getReference().child("Drivers");
-        this.referenceUsers = FirebaseDatabase.getInstance().getReference().child("Users");
-        this.scheduleReference = FirebaseDatabase.getInstance().getReference().child("uploads").child("0");
-        this.hashMap = new HashMap<>();
-        this.referenceDrivers.addListenerForSingleValueEvent(new ValueEventListener() {
+        referenceDrivers = FirebaseDatabase.getInstance().getReference().child("Drivers");
+        referenceUsers = FirebaseDatabase.getInstance().getReference().child("Users");
+        scheduleReference = FirebaseDatabase.getInstance().getReference().child("uploads").child("0");
+        hashMap = new HashMap<>();
+        referenceDrivers.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 FirebaseUser currentUser = auth.getCurrentUser();
                 if (dataSnapshot.child(currentUser.getUid()).child("lat").exists()) {
                     driver_profile = true;
-                    textName.setText((String) dataSnapshot.child(currentUser.getUid()).child(AppMeasurementSDK.ConditionalUserProperty.NAME).getValue(String.class));
+                    //textName.setText((String) dataSnapshot.child(currentUser.getUid()).child(AppMeasurementSDK.ConditionalUserProperty.NAME).getValue(String.class));
                     textEmail.setText((String) dataSnapshot.child(currentUser.getUid()).child("email").getValue(String.class));
                     navigationView.getMenu().clear();
                     navigationView.inflateMenu(R.menu.driver_menu);
@@ -135,7 +135,7 @@ public class Navigation extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot2) {
                         FirebaseUser currentUser2 = auth.getCurrentUser();
-                        textName.setText((String) dataSnapshot2.child(currentUser2.getUid()).child(AppMeasurementSdk.ConditionalUserProperty.NAME).getValue(String.class));
+                        //textName.setText((String) dataSnapshot2.child(currentUser2.getUid()).child(AppMeasurementSdk.ConditionalUserProperty.NAME).getValue(String.class));
                         textEmail.setText((String) dataSnapshot2.child(currentUser2.getUid()).child("email").getValue(String.class));
                         FirebaseMessaging.getInstance().subscribeToTopic("news");
                         navigationView.getMenu().clear();
@@ -154,25 +154,25 @@ public class Navigation extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), databaseError.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-        this.referenceDrivers.addChildEventListener(new ChildEventListener() { // from class: com.haroonfazal.haroonapps.bustracker.Activities.NavigationActivity.2
-            @Override // com.google.firebase.database.ChildEventListener
+        this.referenceDrivers.addChildEventListener(new ChildEventListener() {
+            @Override
             public void onCancelled(DatabaseError databaseError) {
             }
 
-            @Override // com.google.firebase.database.ChildEventListener
+            @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String str) {
             }
 
-            @Override // com.google.firebase.database.ChildEventListener
+            @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
             }
 
-            @Override // com.google.firebase.database.ChildEventListener
+            @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String str) {
                 try {
                     LatLng latLng = new LatLng(Double.parseDouble((String) dataSnapshot.child("lat").getValue(String.class)), Double.parseDouble((String) dataSnapshot.child("lng").getValue(String.class)));
                     MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.title((String) dataSnapshot.child(AppMeasurementSdk.ConditionalUserProperty.NAME).getValue(String.class));
+                    //markerOptions.title((String) dataSnapshot.child(AppMeasurementSdk.ConditionalUserProperty.NAME).getValue(String.class));
                     markerOptions.snippet("Van number: " + ((String) dataSnapshot.child("vehiclenumber").getValue(String.class)));
                     markerOptions.position(latLng);
                     markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.busicon));
@@ -186,7 +186,8 @@ public class Navigation extends AppCompatActivity {
             @Override // com.google.firebase.database.ChildEventListener
             public void onChildChanged(DataSnapshot dataSnapshot, String str) {
                 try {
-                    String obj = dataSnapshot.child(AppMeasurementSdk.ConditionalUserProperty.NAME).getValue().toString();
+                    //String obj = dataSnapshot.child(AppMeasurementSdk.ConditionalUserProperty.NAME).getValue().toString();
+                    String obj = dataSnapshot.child("vehiclenumber").getValue().toString();
                     String obj2 = dataSnapshot.child("lat").getValue().toString();
                     String obj3 = dataSnapshot.child("lng").getValue().toString();
                     updateLatLng = new LatLng(Double.parseDouble(obj2), Double.parseDouble(obj3));

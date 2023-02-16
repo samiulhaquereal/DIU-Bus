@@ -1,15 +1,15 @@
 package com.resoftltd.diubus;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         }
         startActivity(new Intent(this, Navigation.class));
         finish();
+        //startActivity(new Intent(this, DriverRegistrationActivity.class));
 
     }
     public void registerAsUser(View view) {
@@ -44,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void registerAsDriver(View view) {
 
-        //startActivity(new Intent(this, DriverRegistrationActivity.class));
-        Toast.makeText(this, "registerAsDriver Done", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(this, DriverRegistrationActivity.class));
+
     }
 
     public void login(View view) {

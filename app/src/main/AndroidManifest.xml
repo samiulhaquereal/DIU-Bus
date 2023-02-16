@@ -24,6 +24,9 @@
         android:theme="@style/Theme.DIUBus"
         tools:targetApi="31">
         <activity
+            android:name=".DriverRegistrationActivity"
+            android:exported="false" />
+        <activity
             android:name=".Navigation"
             android:exported="false" />
         <activity
@@ -51,15 +54,9 @@
                 android:value="com.google.firebase.components.ComponentRegistrar" />
         </service>
         <service
-            android:name="com.google.firebase.messaging.FirebaseMessagingService"
-            android:exported="true">
-            <intent-filter android:priority="-500">
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-        <service android:name="com.google.android.gms.measurement.AppMeasurementService"
+            android:name="com.google.android.gms.measurement.AppMeasurementService"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false" />
 
         <receiver
             android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
@@ -69,12 +66,11 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </receiver>
+
         <activity
             android:name="com.google.android.gms.common.api.GoogleApiActivity"
             android:exported="false"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-
     </application>
 
 </manifest>
