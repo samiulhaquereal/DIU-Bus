@@ -2,17 +2,13 @@ package com.resoftltd.diubus;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,9 +21,6 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -56,16 +49,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.resoftltd.diubus.Services.LocationShareService;
 import com.resoftltd.diubus.Utils.DirectionAsync;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.Map;
 
 
 public class Navigation extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener, GoogleMap.OnMarkerClickListener, ResultCallback {
@@ -103,8 +91,8 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
         navigationView.setNavigationItemSelectedListener(this);
 
         View headerView = navigationView.getHeaderView(0);
-        textName = (TextView) headerView.findViewById(R.id.title_text);
-        textEmail = (TextView) headerView.findViewById(R.id.email_text);
+        textName = headerView.findViewById(R.id.title_text);
+        textEmail = headerView.findViewById(R.id.email_text);
 
         ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync((OnMapReadyCallback) this);
 
@@ -119,7 +107,6 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
                 FirebaseUser currentUser = auth.getCurrentUser();
                 if (dataSnapshot.child(currentUser.getUid()).child("lat").exists()) {
                     driver_profile = true;
-                    //textName.setText((String) dataSnapshot.child(currentUser.getUid()).child(AppMeasurementSDK.ConditionalUserProperty.NAME).getValue(String.class));
                     textName.setText(dataSnapshot.child(currentUser.getUid()).child("name").getValue(String.class));
                     textEmail.setText(dataSnapshot.child(currentUser.getUid()).child("email").getValue(String.class));
                     navigationView.getMenu().clear();
@@ -132,10 +119,9 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot2) {
                         FirebaseUser currentUser2 = auth.getCurrentUser();
-                        //textName.setText((String) dataSnapshot2.child(currentUser2.getUid()).child(AppMeasurementSdk.ConditionalUserProperty.NAME).getValue(String.class));
+
                         textName.setText(dataSnapshot2.child(currentUser2.getUid()).child("name").getValue(String.class));
                         textEmail.setText(dataSnapshot2.child(currentUser2.getUid()).child("email").getValue(String.class));
-                        FirebaseMessaging.getInstance().subscribeToTopic("news");
                         navigationView.getMenu().clear();
                         navigationView.inflateMenu(R.menu.user_menu);
                     }
@@ -168,7 +154,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String str) {
                 try {
-                    LatLng latLng = new LatLng(Double.parseDouble((String) dataSnapshot.child("lat").getValue(String.class)), Double.parseDouble((String) dataSnapshot.child("lng").getValue(String.class)));
+                    LatLng latLng = new LatLng(Double.parseDouble(dataSnapshot.child("lat").getValue(String.class)), Double.parseDouble( dataSnapshot.child("lng").getValue(String.class)));
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.title(dataSnapshot.child("name").getValue(String.class));
                     markerOptions.snippet("Van number: " + (dataSnapshot.child("vehiclenumber").getValue(String.class)));
@@ -184,7 +170,6 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String str) {
                 try {
-                    //String obj = dataSnapshot.child(AppMeasurementSdk.ConditionalUserProperty.NAME).getValue().toString();
                     String obj = dataSnapshot.child("name").getValue().toString();
                     String obj2 = dataSnapshot.child("lat").getValue().toString();
                     String obj3 = dataSnapshot.child("lng").getValue().toString();
@@ -283,79 +268,6 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
         return true;
     }
 
-    private void openDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LinearLayout linearLayout = new LinearLayout(this);
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(-1, -2);
-        layoutParams.setMargins(50, 0, 50, 100);
-        final EditText editText = new EditText(this);
-        editText.setLayoutParams(layoutParams);
-        editText.setGravity(8388659);
-        editText.setInputType(16384);
-        editText.setLines(1);
-        editText.setHint("Enter title");
-        editText.setMaxLines(1);
-        final EditText editText2 = new EditText(this);
-        editText2.setLayoutParams(layoutParams);
-        editText2.setGravity(8388659);
-        editText2.setHint("Enter message");
-        editText2.setInputType(16384);
-        editText2.setLines(1);
-        editText2.setMaxLines(1);
-        linearLayout.addView(editText, layoutParams);
-        linearLayout.addView(editText2, layoutParams);
-        builder.setMessage("Enter your notification details");
-        builder.setTitle("Send Notifications");
-        builder.setView(linearLayout);
-        builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
-            @Override // android.content.DialogInterface.OnClickListener
-            public void onClick(DialogInterface dialogInterface, int i) {
-                try {
-                    sendFcm(editText.getText().toString(), editText2.getText().toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override // android.content.DialogInterface.OnClickListener
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
-        builder.show();
-    }
-
-
-    public void sendFcm(String str, String str2) throws JSONException {
-        JSONObject jSONObject = new JSONObject();
-        jSONObject.put("to", "/topics/news");
-        JSONObject jSONObject2 = new JSONObject();
-        jSONObject2.put("title", str);
-        jSONObject2.put("body", str2);
-        jSONObject.put("notification", jSONObject2);
-        this.requestQueue.add(new JsonObjectRequest(1, "https://fcm.googleapis.com/fcm/send", jSONObject, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject jSONObject3) {
-                //Log.d("response", jSONObject3.toString());
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                Context applicationContext = getApplicationContext();
-                Toast.makeText(applicationContext, "error in response=" + volleyError.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() {
-                HashMap hashMap = new HashMap();
-                hashMap.put("content-type", "application/json");
-                hashMap.put("authorization", "key=AIzaSyDPqeShdSvznztq8n8Y0RZTMdm_BE9Ks88");
-                return hashMap;
-            }
-        });
-    }
 
     public boolean isServiceRunning(Context context, Class<?> cls) {
         for (ActivityManager.RunningServiceInfo runningServiceInfo : ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE)).getRunningServices(Integer.MAX_VALUE)) {
@@ -370,14 +282,14 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     @SuppressLint({"RestrictedApi"})
     public void onConnected(@Nullable Bundle bundle) {
         LocationRequest locationRequest = new LocationRequest();
-        this.request = LocationRequest.create();
-        this.request.setPriority(100);
-        this.request.setInterval(5000L);
+        request = LocationRequest.create();
+        request.setPriority(100);
+        request.setInterval(5000L);
         if (ActivityCompat.checkSelfPermission(this, "android.permission.ACCESS_FINE_LOCATION") == 0 || ActivityCompat.checkSelfPermission(this, "android.permission.ACCESS_COARSE_LOCATION") == 0) {
-            LocationSettingsRequest.Builder addLocationRequest = new LocationSettingsRequest.Builder().addLocationRequest(this.request);
+            LocationSettingsRequest.Builder addLocationRequest = new LocationSettingsRequest.Builder().addLocationRequest(request);
             addLocationRequest.setAlwaysShow(true);
-            LocationServices.SettingsApi.checkLocationSettings(this.client, addLocationRequest.build()).setResultCallback((ResultCallback<? super LocationSettingsResult>) this);
-            LocationServices.FusedLocationApi.requestLocationUpdates(this.client, this.request, (LocationListener) this);
+            LocationServices.SettingsApi.checkLocationSettings(client, addLocationRequest.build()).setResultCallback((ResultCallback<? super LocationSettingsResult>) this);
+            LocationServices.FusedLocationApi.requestLocationUpdates(client,request,this);
         }
     }
 
@@ -387,14 +299,14 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     }
 
     public void onLocationChanged(Location location) {
-        LocationServices.FusedLocationApi.removeLocationUpdates(this.client, (LocationListener) this);
+        LocationServices.FusedLocationApi.removeLocationUpdates(client,this);
         if (location == null) {
             Toast.makeText(getApplicationContext(), "Could not find location", Toast.LENGTH_SHORT).show();
             return;
         }
-        this.latLngCurrentuserLocation = new LatLng(location.getLatitude(), location.getLongitude());
-        this.mMap.addMarker(new MarkerOptions().position(this.latLngCurrentuserLocation).icon(BitmapDescriptorFactory.defaultMarker(210.0f))).setVisible(true);
-        this.mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(this.latLngCurrentuserLocation, 15.0f));
+        latLngCurrentuserLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(this.latLngCurrentuserLocation).icon(BitmapDescriptorFactory.fromResource(R.drawable.busicon))).setVisible(true);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(this.latLngCurrentuserLocation, 15.0f));
     }
 
 

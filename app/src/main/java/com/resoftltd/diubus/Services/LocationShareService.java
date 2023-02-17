@@ -46,15 +46,15 @@ public class LocationShareService extends Service implements LocationListener, G
     public final int uniqueId = 654321;
     FirebaseUser user;
 
-    @Override // com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener
+    @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
 
-    @Override // com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks
+    @Override
     public void onConnectionSuspended(int i) {
     }
 
-    @Override // android.app.Service
+    @Override
     public IBinder onBind(Intent intent) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
@@ -62,19 +62,19 @@ public class LocationShareService extends Service implements LocationListener, G
     @Override // android.app.Service
     public void onCreate() {
         super.onCreate();
-        this.reference = FirebaseDatabase.getInstance().getReference().child("Drivers");
-        this.auth = FirebaseAuth.getInstance();
-        this.user = this.auth.getCurrentUser();
-        this.client = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
-        this.client.connect();
+        reference = FirebaseDatabase.getInstance().getReference().child("Drivers");
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
+        client = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
+        client.connect();
     }
 
-    @Override // com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks
+    @Override
     public void onConnected(@Nullable Bundle bundle) {
         new LocationRequest();
-        this.request = LocationRequest.create();
-        this.request.setPriority(100);
-        this.request.setInterval(1000L);
+        request = LocationRequest.create();
+        request.setPriority(100);
+        request.setInterval(1000L);
         if (ActivityCompat.checkSelfPermission(this, "android.permission.ACCESS_FINE_LOCATION") == 0 || ActivityCompat.checkSelfPermission(this, "android.permission.ACCESS_COARSE_LOCATION") == 0) {
             LocationServices.FusedLocationApi.requestLocationUpdates(this.client, this.request, this);
             showNotifications();
@@ -116,7 +116,7 @@ public class LocationShareService extends Service implements LocationListener, G
 
     public void shareLocation() {
         try {
-            this.reference.child(this.user.getUid()).child("lat").setValue(String.valueOf(this.latLngCurrent.latitude));
+            reference.child(user.getUid()).child("lat").setValue(String.valueOf(this.latLngCurrent.latitude));
             this.reference.child(this.user.getUid()).child("lng").setValue(String.valueOf(this.latLngCurrent.longitude)).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -132,7 +132,7 @@ public class LocationShareService extends Service implements LocationListener, G
         }
     }
 
-    @Override // android.app.Service
+    @Override
     public void onDestroy() {
         LocationServices.FusedLocationApi.removeLocationUpdates(this.client, this);
         this.client.disconnect();

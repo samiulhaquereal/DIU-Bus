@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,8 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void registerAsUser(View view) {
-        //startActivity(new Intent(this, UserRegistrationActivity.class));
-        Toast.makeText(this, "registerAsUser Done", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(this, UserRegistrationActivity.class));
         }
 
     public void registerAsDriver(View view) {
