@@ -99,7 +99,6 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
 
         referenceDrivers = FirebaseDatabase.getInstance().getReference().child("Drivers");
         referenceUsers = FirebaseDatabase.getInstance().getReference().child("Users");
-        scheduleReference = FirebaseDatabase.getInstance().getReference().child("uploads").child("0");
         hashMap = new HashMap<>();
 
         referenceDrivers.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -206,7 +205,6 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
             sb.append("&destination=" + this.u.latitude + "," + this.u.longitude);
             sb.append("&key=AIzaSyDPqeShdSvznztq8n8Y0RZTMdm_BE9Ks88");
             new DirectionAsync(getApplicationContext()).execute(this.mMap, sb.toString(), new LatLng(position.latitude, position.longitude), new LatLng(this.u.latitude, this.u.longitude), marker);
-
         }catch (Exception e) {
             Toast.makeText(this, "Sorry , You are not User", Toast.LENGTH_SHORT).show();
         }

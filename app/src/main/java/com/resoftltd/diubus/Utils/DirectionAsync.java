@@ -64,7 +64,7 @@ public class DirectionAsync extends AsyncTask<Object, String, String> {
         return this.data;
     }
 
-    @Override // android.os.AsyncTask
+    @Override
     public void onPostExecute(String str) {
         try {
             JSONObject jSONObject = new JSONObject(str);
