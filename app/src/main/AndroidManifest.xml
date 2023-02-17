@@ -24,6 +24,9 @@
         android:theme="@style/Theme.DIUBus"
         tools:targetApi="31">
         <activity
+            android:name=".Login"
+            android:exported="false" />
+        <activity
             android:name=".DriverRegistrationActivity"
             android:exported="false" />
         <activity

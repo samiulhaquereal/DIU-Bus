@@ -25,15 +25,10 @@ public class DriverRegistrationActivity extends AppCompatActivity {
     FirebaseAuth auth;
     DatabaseReference databaseReference;
     ProgressDialog dialog;
-
-
     EditText editTextDriverBus;
-
     EditText editTextDriverEmail;
-
     EditText editTextDriverName;
     EditText editTextDriverPassword;
-
     Toolbar toolbar;
     FirebaseUser user;
 

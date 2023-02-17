@@ -49,8 +49,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void login(View view) {
-        //startActivity(new Intent(this, LoginActivity.class));
-        Toast.makeText(this, "login Done", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(this, Login.class));
     }
 
     private boolean checkPermissions() {
