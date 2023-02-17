@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -21,7 +20,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.resoftltd.diubus.Models.Driver;
 
 public class DriverRegistrationActivity extends AppCompatActivity {
-
     FirebaseAuth auth;
     DatabaseReference databaseReference;
     ProgressDialog dialog;
@@ -29,7 +27,6 @@ public class DriverRegistrationActivity extends AppCompatActivity {
     EditText editTextDriverEmail;
     EditText editTextDriverName;
     EditText editTextDriverPassword;
-    Toolbar toolbar;
     FirebaseUser user;
 
 
@@ -37,8 +34,7 @@ public class DriverRegistrationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_registration);
-        //toolbar.setTitle("Driver Register");
-        //setSupportActionBar(toolbar);
+
         auth = FirebaseAuth.getInstance();
         dialog = new ProgressDialog(this);
         editTextDriverName = findViewById(R.id.editTextdriverName);
@@ -68,7 +64,7 @@ public class DriverRegistrationActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-                    Driver driver = new Driver(editTextDriverName.getText().toString(), editTextDriverEmail.getText().toString(), editTextDriverPassword.getText().toString(), editTextDriverBus.getText().toString(), "24.886436", "91.880722");
+                    Driver driver = new Driver(editTextDriverName.getText().toString(), editTextDriverEmail.getText().toString(), editTextDriverPassword.getText().toString(), editTextDriverBus.getText().toString(), "0", "0");
                     DriverRegistrationActivity driverRegistrationActivity = DriverRegistrationActivity.this;
                     driverRegistrationActivity.user = driverRegistrationActivity.auth.getCurrentUser();
                     DriverRegistrationActivity.this.databaseReference = FirebaseDatabase.getInstance().getReference().child("Drivers").child(user.getUid());

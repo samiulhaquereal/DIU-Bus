@@ -60,7 +60,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     FirebaseAuth auth;
     GoogleApiClient client;
     HashMap<String, Marker> hashMap;
-    LatLng latLngCurrentuserLocation;
+    LatLng latLngCurrentuserLocation,u;
     GoogleMap mMap;
     DatabaseReference referenceDrivers;
     DatabaseReference referenceUsers;
@@ -68,6 +68,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     RequestQueue requestQueue;
     DatabaseReference scheduleReference;
     TextView textEmail;
+    FirebaseUser user;
     TextView textName;
     LatLng updateLatLng;
     boolean driver_profile = false;
@@ -94,7 +95,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
         textName = headerView.findViewById(R.id.title_text);
         textEmail = headerView.findViewById(R.id.email_text);
 
-        ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync((OnMapReadyCallback) this);
+        ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync( this);
 
         referenceDrivers = FirebaseDatabase.getInstance().getReference().child("Drivers");
         referenceUsers = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -119,7 +120,6 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot2) {
                         FirebaseUser currentUser2 = auth.getCurrentUser();
-
                         textName.setText(dataSnapshot2.child(currentUser2.getUid()).child("name").getValue(String.class));
                         textEmail.setText(dataSnapshot2.child(currentUser2.getUid()).child("email").getValue(String.class));
                         navigationView.getMenu().clear();
@@ -189,21 +189,27 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMarkerClickListener(this);
+
+
         client = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addOnConnectionFailedListener(this).addConnectionCallbacks(this).build();
         client.connect();
     }
 
     public boolean onMarkerClick(Marker marker) {
-        LatLng position = marker.getPosition();
-        String format = new DecimalFormat("#.##").format(CalculationByDistance(this.latLngCurrentuserLocation, position));
-        Toast.makeText(this, format + " KM far.", Toast.LENGTH_SHORT).show();
-        //Toast.makeText(this, " "+position.latitude+" "+position.longitude, Toast.LENGTH_SHORT).show();
-        StringBuilder sb = new StringBuilder();
-        sb.append("https://maps.googleapis.com/maps/api/directions/json?");
-        sb.append("origin=" + position.latitude + "," + position.longitude);
-        sb.append("&destination=" + this.latLngCurrentuserLocation.latitude + "," + this.latLngCurrentuserLocation.longitude);
-        sb.append("&key=AIzaSyDPqeShdSvznztq8n8Y0RZTMdm_BE9Ks88");
-        new DirectionAsync(getApplicationContext()).execute(this.mMap, sb.toString(), new LatLng(position.latitude, position.longitude), new LatLng(this.latLngCurrentuserLocation.latitude, this.latLngCurrentuserLocation.longitude), marker);
+        try {
+            LatLng position = marker.getPosition();
+            String format = new DecimalFormat("#.##").format(CalculationByDistance(this.u, position));
+            Toast.makeText(this, format + " KM far.", Toast.LENGTH_SHORT).show();
+            StringBuilder sb = new StringBuilder();
+            sb.append("https://maps.googleapis.com/maps/api/directions/json?");
+            sb.append("origin=" + position.latitude + "," + position.longitude);
+            sb.append("&destination=" + this.u.latitude + "," + this.u.longitude);
+            sb.append("&key=AIzaSyDPqeShdSvznztq8n8Y0RZTMdm_BE9Ks88");
+            new DirectionAsync(getApplicationContext()).execute(this.mMap, sb.toString(), new LatLng(position.latitude, position.longitude), new LatLng(this.u.latitude, this.u.longitude), marker);
+
+        }catch (Exception e) {
+            Toast.makeText(this, "Sorry , You are not User", Toast.LENGTH_SHORT).show();
+        }
         return true;
     }
 
@@ -226,7 +232,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawerLayout =findViewById(R.id.drawer_layout);
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
@@ -251,11 +257,13 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
                     Toast.makeText(getApplicationContext(), "You are already sharing your location.", 0).show();
                 } else if (this.driver_profile) {
                     startService(new Intent(this, LocationShareService.class));
+                    Toast.makeText(getApplicationContext(), "Started", 0).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Only driver can share location", 0).show();
                 }
             } else if (itemId == R.id.nav_stop_Location) {
                 stopService(new Intent(this, LocationShareService.class));
+                Toast.makeText(getApplicationContext(), "Stoped", 0).show();
             }
         } else if (itemId == R.id.nav_signout_user && (firebaseAuth = this.auth) != null) {
             firebaseAuth.signOut();
@@ -304,9 +312,22 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
             Toast.makeText(getApplicationContext(), "Could not find location", Toast.LENGTH_SHORT).show();
             return;
         }
-        latLngCurrentuserLocation = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(this.latLngCurrentuserLocation).icon(BitmapDescriptorFactory.fromResource(R.drawable.busicon))).setVisible(true);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(this.latLngCurrentuserLocation, 15.0f));
+
+        if(driver_profile==false){
+            u = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(this.u).icon(BitmapDescriptorFactory.defaultMarker())).setVisible(true);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(u, 15.0f));
+
+        }else{
+            user = auth.getCurrentUser();
+            FirebaseDatabase.getInstance().getReference().child("Drivers").child(user.getUid()).child("lat").setValue(location.getLatitude());
+            FirebaseDatabase.getInstance().getReference().child("Drivers").child(user.getUid()).child("lng").setValue(location.getLongitude());
+
+            latLngCurrentuserLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(this.latLngCurrentuserLocation).icon(BitmapDescriptorFactory.fromResource(R.drawable.busicon))).setVisible(true);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(this.latLngCurrentuserLocation, 15.0f));
+        }
+
     }
 
 

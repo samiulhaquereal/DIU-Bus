@@ -8,6 +8,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,8 +64,7 @@ public class DirectionAsync extends AsyncTask<Object, String, String> {
         return this.data;
     }
 
-
-    @Override
+    @Override // android.os.AsyncTask
     public void onPostExecute(String str) {
         try {
             JSONObject jSONObject = new JSONObject(str);
@@ -81,8 +81,8 @@ public class DirectionAsync extends AsyncTask<Object, String, String> {
                 PolylineOptions polylineOptions = new PolylineOptions();
                 polylineOptions.color(-16711936);
                 polylineOptions.width(10.0f);
-                //polylineOptions.addAll(PolyUnit.decode(str2));
-                mMap.addPolyline(polylineOptions);
+                polylineOptions.addAll(PolyUtil.decode(str2));
+                this.mMap.addPolyline(polylineOptions);
             }
         } catch (JSONException e) {
             e.printStackTrace();
