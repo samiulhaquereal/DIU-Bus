@@ -8,8 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
-
-
     </com.google.android.material.appbar.AppBarLayout>
 
     <include layout="@layout/contentnavigation" />

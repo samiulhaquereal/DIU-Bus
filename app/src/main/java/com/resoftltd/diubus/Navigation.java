@@ -90,9 +90,6 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
-        //Toolbar toolbarc = findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbarc);
-
 
         auth = FirebaseAuth.getInstance();
         requestQueue = Volley.newRequestQueue(this);
@@ -103,7 +100,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
         actionBarDrawerToggle.syncState();
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
-        navigationView.setNavigationItemSelectedListener((NavigationView.OnNavigationItemSelectedListener) this);
+        navigationView.setNavigationItemSelectedListener(this);
 
         View headerView = navigationView.getHeaderView(0);
         textName = (TextView) headerView.findViewById(R.id.title_text);
@@ -115,6 +112,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
         referenceUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         scheduleReference = FirebaseDatabase.getInstance().getReference().child("uploads").child("0");
         hashMap = new HashMap<>();
+
         referenceDrivers.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
