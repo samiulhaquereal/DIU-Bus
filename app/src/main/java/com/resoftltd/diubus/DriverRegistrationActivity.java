@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -18,6 +19,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.resoftltd.diubus.Models.Driver;
+
+import butterknife.ButterKnife;
 
 public class DriverRegistrationActivity extends AppCompatActivity {
     FirebaseAuth auth;
@@ -34,6 +37,9 @@ public class DriverRegistrationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_registration);
+        ButterKnife.bind(this);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.userToolbar);
+        toolbar.setTitle("Driver's Registration");
 
         auth = FirebaseAuth.getInstance();
         dialog = new ProgressDialog(this);

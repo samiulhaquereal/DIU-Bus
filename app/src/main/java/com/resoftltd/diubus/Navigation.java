@@ -68,7 +68,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     RequestQueue requestQueue;
     DatabaseReference scheduleReference;
     TextView textEmail;
-    FirebaseUser user,a;
+    FirebaseUser user;
     TextView textName,busnumber;
     LatLng updateLatLng;
     boolean driver_profile = false;

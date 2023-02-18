@@ -7,6 +7,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -14,6 +15,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
+
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
         user = auth.getCurrentUser();
         if (user == null) {
             setContentView(R.layout.activity_main);
+            ButterKnife.bind(this);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.userToolbar);
+            toolbar.setTitle("DIU Bus Services");
             checkPermissions();
             return;
         }

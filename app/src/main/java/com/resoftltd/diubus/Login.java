@@ -17,6 +17,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+import butterknife.ButterKnife;
+
 public class Login extends AppCompatActivity {
     FirebaseAuth auth;
     ProgressDialog dialog;
@@ -29,6 +31,9 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.userToolbar);
+        toolbar.setTitle("Login");
 
         editTextUserPassword = findViewById(R.id.loginidpass);
         editTextUserEmail = findViewById(R.id.loginidemail);
