@@ -50,9 +50,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.resoftltd.diubus.Services.LocationShareService;
-import com.resoftltd.diubus.Utils.DirectionAsync;
 
-import java.text.DecimalFormat;
 import java.util.HashMap;
 
 import butterknife.ButterKnife;
@@ -71,7 +69,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     DatabaseReference scheduleReference;
     TextView textEmail;
     FirebaseUser user,a;
-    TextView textName;
+    TextView textName,busnumber;
     LatLng updateLatLng;
     boolean driver_profile = false;
     boolean user_profile = false;
@@ -100,6 +98,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
         View headerView = navigationView.getHeaderView(0);
         textName = headerView.findViewById(R.id.title_text);
         textEmail = headerView.findViewById(R.id.email_text);
+        busnumber = headerView.findViewById(R.id.busno);
 
         ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync( this);
 
@@ -115,6 +114,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
                     driver_profile = true;
                     textName.setText(dataSnapshot.child(currentUser.getUid()).child("name").getValue(String.class));
                     textEmail.setText(dataSnapshot.child(currentUser.getUid()).child("email").getValue(String.class));
+                    busnumber.setText("Bus Number : "+dataSnapshot.child(currentUser.getUid()).child("vehiclenumber").getValue(String.class));
                     navigationView.getMenu().clear();
                     navigationView.inflateMenu(R.menu.driver_menu);
                     return;
@@ -162,7 +162,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
                     LatLng latLng = new LatLng(Double.parseDouble(dataSnapshot.child("lat").getValue(String.class)), Double.parseDouble( dataSnapshot.child("lng").getValue(String.class)));
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.title(dataSnapshot.child("name").getValue(String.class));
-                    markerOptions.snippet("Van number: " + (dataSnapshot.child("vehiclenumber").getValue(String.class)));
+                    markerOptions.snippet("Bus number: " + (dataSnapshot.child("vehiclenumber").getValue(String.class)));
                     markerOptions.position(latLng);
                     markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.busicon));
                     Marker addMarker = mMap.addMarker(markerOptions);
@@ -193,10 +193,11 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setOnMarkerClickListener(this);
+        //mMap.setOnMarkerClickListener(this);
         client = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addOnConnectionFailedListener(this).addConnectionCallbacks(this).build();
         client.connect();
     }
+    /*
     @Override
     public boolean onMarkerClick(Marker marker) {
         try {
@@ -231,6 +232,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
         Integer.valueOf(decimalFormat.format(d6)).intValue();
         return d6;
     }
+    */
 
     @Override
     public void onBackPressed() {
@@ -246,7 +248,6 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     @SuppressLint("WrongConstant")
     public boolean onNavigationItemSelected(MenuItem menuItem) {
         FirebaseAuth firebaseAuth;
-        a = auth.getCurrentUser();
         int itemId = menuItem.getItemId();
         if (this.driver_profile) {
             if (itemId == R.id.nav_signout) {
@@ -357,5 +358,9 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker) {
+        return false;
     }
 }
