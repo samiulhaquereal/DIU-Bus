@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -31,7 +32,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -55,6 +55,8 @@ import com.resoftltd.diubus.Utils.DirectionAsync;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
+import butterknife.ButterKnife;
+
 
 public class Navigation extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener, GoogleMap.OnMarkerClickListener, ResultCallback {
     FirebaseAuth auth;
@@ -68,23 +70,27 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     RequestQueue requestQueue;
     DatabaseReference scheduleReference;
     TextView textEmail;
-    FirebaseUser user;
+    FirebaseUser user,a;
     TextView textName;
     LatLng updateLatLng;
     boolean driver_profile = false;
     boolean user_profile = false;
 
 
+    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
-
+        ButterKnife.bind(this);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Live Location");
+        setSupportActionBar(toolbar);
         auth = FirebaseAuth.getInstance();
         requestQueue = Volley.newRequestQueue(this);
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.Open, R.string.Colse);
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.Open, R.string.Colse);
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -184,16 +190,14 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
         });
     }
 
-
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMarkerClickListener(this);
-
-
         client = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addOnConnectionFailedListener(this).addConnectionCallbacks(this).build();
         client.connect();
     }
-
+    @Override
     public boolean onMarkerClick(Marker marker) {
         try {
             LatLng position = marker.getPosition();
@@ -202,9 +206,9 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
             StringBuilder sb = new StringBuilder();
             sb.append("https://maps.googleapis.com/maps/api/directions/json?");
             sb.append("origin=" + position.latitude + "," + position.longitude);
-            sb.append("&destination=" + this.u.latitude + "," + this.u.longitude);
+            sb.append("&destination=" + this.u.latitude + "," +u.longitude);
             sb.append("&key=AIzaSyDPqeShdSvznztq8n8Y0RZTMdm_BE9Ks88");
-            new DirectionAsync(getApplicationContext()).execute(this.mMap, sb.toString(), new LatLng(position.latitude, position.longitude), new LatLng(this.u.latitude, this.u.longitude), marker);
+            new DirectionAsync(getApplicationContext()).execute(mMap, sb.toString(), new LatLng(position.latitude, position.longitude), new LatLng(this.u.latitude, this.u.longitude), marker);
         }catch (Exception e) {
             Toast.makeText(this, "Sorry , You are not User", Toast.LENGTH_SHORT).show();
         }
@@ -234,17 +238,19 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            finish();
         }
     }
 
+    @Override
     @SuppressLint("WrongConstant")
     public boolean onNavigationItemSelected(MenuItem menuItem) {
         FirebaseAuth firebaseAuth;
+        a = auth.getCurrentUser();
         int itemId = menuItem.getItemId();
         if (this.driver_profile) {
             if (itemId == R.id.nav_signout) {
-                FirebaseAuth firebaseAuth2 = this.auth;
+                FirebaseAuth firebaseAuth2 = auth;
                 if (firebaseAuth2 != null) {
                     firebaseAuth2.signOut();
                     finish();
@@ -253,13 +259,16 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
             } else if (itemId == R.id.nav_share_Location) {
                 if (isServiceRunning(getApplicationContext(), LocationShareService.class)) {
                     Toast.makeText(getApplicationContext(), "You are already sharing your location.", 0).show();
-                } else if (this.driver_profile) {
+                }
+                else if (driver_profile) {
                     startService(new Intent(this, LocationShareService.class));
                     Toast.makeText(getApplicationContext(), "Started", 0).show();
-                } else {
+                }
+                else {
                     Toast.makeText(getApplicationContext(), "Only driver can share location", 0).show();
                 }
-            } else if (itemId == R.id.nav_stop_Location) {
+            }
+            else if (itemId == R.id.nav_stop_Location) {
                 stopService(new Intent(this, LocationShareService.class));
                 Toast.makeText(getApplicationContext(), "Stoped", 0).show();
             }
@@ -267,12 +276,12 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
             firebaseAuth.signOut();
             finish();
             Intent intent = new Intent(this, MainActivity.class);
-            intent.addFlags(335544320);
             startActivity(intent);
         }
         ((DrawerLayout) findViewById(R.id.drawer_layout)).closeDrawer(GravityCompat.START);
         return true;
     }
+
 
 
     public boolean isServiceRunning(Context context, Class<?> cls) {
@@ -285,17 +294,18 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     }
 
 
+    @Override
     @SuppressLint({"RestrictedApi"})
     public void onConnected(@Nullable Bundle bundle) {
-        LocationRequest locationRequest = new LocationRequest();
+        new LocationRequest();
         request = LocationRequest.create();
         request.setPriority(100);
         request.setInterval(5000L);
         if (ActivityCompat.checkSelfPermission(this, "android.permission.ACCESS_FINE_LOCATION") == 0 || ActivityCompat.checkSelfPermission(this, "android.permission.ACCESS_COARSE_LOCATION") == 0) {
             LocationSettingsRequest.Builder addLocationRequest = new LocationSettingsRequest.Builder().addLocationRequest(request);
             addLocationRequest.setAlwaysShow(true);
-            LocationServices.SettingsApi.checkLocationSettings(client, addLocationRequest.build()).setResultCallback((ResultCallback<? super LocationSettingsResult>) this);
-            LocationServices.FusedLocationApi.requestLocationUpdates(client,request,this);
+            LocationServices.SettingsApi.checkLocationSettings(client, addLocationRequest.build()).setResultCallback(this);
+            LocationServices.FusedLocationApi.requestLocationUpdates(client,request, this);
         }
     }
 
@@ -304,6 +314,7 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
 
     }
 
+    @Override
     public void onLocationChanged(Location location) {
         LocationServices.FusedLocationApi.removeLocationUpdates(client,this);
         if (location == null) {
@@ -312,9 +323,10 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
         }
 
         if(driver_profile==false){
+            FirebaseUser user2 = auth.getCurrentUser();
             u = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(this.u).icon(BitmapDescriptorFactory.defaultMarker())).setVisible(true);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(u, 15.0f));
+            mMap.addMarker(new MarkerOptions().position(this.u).title(String.valueOf(FirebaseDatabase.getInstance().getReference().child("Users").child(user2.getUid()).child("name"))).icon(BitmapDescriptorFactory.defaultMarker())).setVisible(true);
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(u, 15.0f));
 
         }else{
             user = auth.getCurrentUser();
@@ -323,12 +335,13 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
 
             latLngCurrentuserLocation = new LatLng(location.getLatitude(), location.getLongitude());
             mMap.addMarker(new MarkerOptions().position(this.latLngCurrentuserLocation).icon(BitmapDescriptorFactory.fromResource(R.drawable.busicon))).setVisible(true);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(this.latLngCurrentuserLocation, 15.0f));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(this.latLngCurrentuserLocation, 15.0f));
         }
 
     }
 
 
+    @Override
     public void onResult(@NonNull Result result) {
         Status status = result.getStatus();
         int statusCode = ((Status) status).getStatusCode();

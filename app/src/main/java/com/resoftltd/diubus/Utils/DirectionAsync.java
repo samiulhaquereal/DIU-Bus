@@ -64,7 +64,7 @@ public class DirectionAsync extends AsyncTask<Object, String, String> {
         return this.data;
     }
 
-    @Override
+    @Override // android.os.AsyncTask
     public void onPostExecute(String str) {
         try {
             JSONObject jSONObject = new JSONObject(str);
@@ -82,7 +82,7 @@ public class DirectionAsync extends AsyncTask<Object, String, String> {
                 polylineOptions.color(-16711936);
                 polylineOptions.width(10.0f);
                 polylineOptions.addAll(PolyUtil.decode(str2));
-                this.mMap.addPolyline(polylineOptions);
+                mMap.addPolyline(polylineOptions);
             }
         } catch (JSONException e) {
             e.printStackTrace();
