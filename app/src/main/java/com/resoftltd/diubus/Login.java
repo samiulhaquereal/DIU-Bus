@@ -16,14 +16,20 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 
 import butterknife.ButterKnife;
 
 public class Login extends AppCompatActivity {
     FirebaseAuth auth;
+    DatabaseReference referenceDrivers;
     ProgressDialog dialog;
     EditText editTextUserEmail;
     EditText editTextUserPassword;
+
+    boolean driver_profile = false;
+    boolean user_profile = false;
+
     Toolbar toolbar;
 
 
@@ -52,20 +58,22 @@ public class Login extends AppCompatActivity {
             this.dialog.dismiss();
             return;
         }
-        this.auth.signInWithEmailAndPassword(this.editTextUserEmail.getText().toString(), this.editTextUserPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        auth.signInWithEmailAndPassword(this.editTextUserEmail.getText().toString(), this.editTextUserPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 
             @SuppressLint("WrongConstant")
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     dialog.dismiss();
-                    Intent intent = new Intent(Login.this, Navigation.class);
+                    Intent intent = new Intent(Login.this, DriversMaps.class);
                     intent.addFlags(335544320);
                     startActivity(intent);
                     finish();
                     return;
+                }else{
+                    Toast.makeText(getApplicationContext(), "Wrong email/password combination. Try again.", 0).show();
+                    dialog.dismiss();
                 }
-                Toast.makeText(getApplicationContext(), "Wrong email/password combination. Try again.", 0).show();
-                dialog.dismiss();
+
             }
         });
     }

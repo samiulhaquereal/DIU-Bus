@@ -24,6 +24,28 @@
         android:theme="@style/Theme.DIUBus"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <!--
+             TODO: Before you run your application, you need a Google Maps API key.
+
+             To get one, follow the directions here:
+
+                https://developers.google.com/maps/documentation/android-sdk/get-api-key
+
+             Once you have your API key (it starts with "AIza"), define a new property in your
+             project's local.properties file (e.g. MAPS_API_KEY=Aiza...), and replace the
+             "YOUR_API_KEY" string in this file with "${MAPS_API_KEY}".
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDPqeShdSvznztq8n8Y0RZTMdm_BE9Ks88" />
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name=".DriversMaps"
+            android:exported="false"
+            android:label="@string/title_activity_drivers_maps" />
         <activity
             android:name=".UserRegistrationActivity"
             android:exported="false" />
@@ -49,10 +71,6 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDPqeShdSvznztq8n8Y0RZTMdm_BE9Ks88" />
 
         <service
             android:name="com.google.firebase.components.ComponentDiscoveryService"

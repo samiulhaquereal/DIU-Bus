@@ -3,5 +3,6 @@
     <string name="Colse">Close</string>
     <string name="Open">Open</string>
     <string name="google_maps_key">AIzaSyDPqeShdSvznztq8n8Y0RZTMdm_BE9Ks88</string>
+    <string name="title_activity_drivers_maps">DriversMaps</string>
 
 </resources>

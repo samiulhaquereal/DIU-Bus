@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
             checkPermissions();
             return;
         }
-        startActivity(new Intent(this, Navigation.class));
+        startActivity(new Intent(this, DriversMaps.class));
         finish();
 
     }

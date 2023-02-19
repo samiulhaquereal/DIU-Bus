@@ -81,7 +81,7 @@ public class DriverRegistrationActivity extends AppCompatActivity {
                                 dialog.dismiss();
                                 Toast.makeText(DriverRegistrationActivity.this, "Account created successfully", Toast.LENGTH_SHORT).show();
                                 finish();
-                                Intent intent = new Intent(DriverRegistrationActivity.this, Navigation.class);
+                                Intent intent = new Intent(DriverRegistrationActivity.this, DriversMaps.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
                                 return;
