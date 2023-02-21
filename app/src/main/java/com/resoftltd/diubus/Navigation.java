@@ -60,13 +60,12 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
     FirebaseAuth auth;
     GoogleApiClient client;
     HashMap<String, Marker> hashMap;
-    LatLng latLngCurrentuserLocation,u;
+    LatLng u;
     GoogleMap mMap;
     DatabaseReference referenceDrivers;
     DatabaseReference referenceUsers;
     LocationRequest request;
     RequestQueue requestQueue;
-    DatabaseReference scheduleReference;
     TextView textEmail;
     FirebaseUser user;
     TextView textName,busnumber;
@@ -105,42 +104,19 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
         referenceDrivers = FirebaseDatabase.getInstance().getReference().child("Drivers");
         referenceUsers = FirebaseDatabase.getInstance().getReference().child("Users");
         hashMap = new HashMap<>();
-
-        referenceDrivers.addListenerForSingleValueEvent(new ValueEventListener() {
+        referenceUsers.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                FirebaseUser currentUser = auth.getCurrentUser();
-                if (dataSnapshot.child(currentUser.getUid()).child("lat").exists()) {
-                    driver_profile = true;
-                    textName.setText(dataSnapshot.child(currentUser.getUid()).child("name").getValue(String.class));
-                    textEmail.setText(dataSnapshot.child(currentUser.getUid()).child("email").getValue(String.class));
-                    busnumber.setText("Bus Number : "+dataSnapshot.child(currentUser.getUid()).child("vehiclenumber").getValue(String.class));
-                    navigationView.getMenu().clear();
-                    navigationView.inflateMenu(R.menu.driver_menu);
-                    return;
-                }
-                Navigation navigationActivity = Navigation.this;
-                navigationActivity.user_profile = true;
-                navigationActivity.referenceUsers.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot2) {
-                        FirebaseUser currentUser2 = auth.getCurrentUser();
-                        textName.setText(dataSnapshot2.child(currentUser2.getUid()).child("name").getValue(String.class));
-                        textEmail.setText(dataSnapshot2.child(currentUser2.getUid()).child("email").getValue(String.class));
-                        navigationView.getMenu().clear();
-                        navigationView.inflateMenu(R.menu.user_menu);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Toast.makeText(getApplicationContext(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+            public void onDataChange(DataSnapshot dataSnapshot2) {
+                FirebaseUser currentUser2 = auth.getCurrentUser();
+                textName.setText(dataSnapshot2.child(currentUser2.getUid()).child("name").getValue(String.class));
+                textEmail.setText(dataSnapshot2.child(currentUser2.getUid()).child("email").getValue(String.class));
+                navigationView.getMenu().clear();
+                navigationView.inflateMenu(R.menu.user_menu);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), databaseError.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
         referenceDrivers.addChildEventListener(new ChildEventListener() {
@@ -322,23 +298,10 @@ public class Navigation extends AppCompatActivity implements NavigationView.OnNa
             Toast.makeText(getApplicationContext(), "Could not find location", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        if(driver_profile==false){
-            FirebaseUser user2 = auth.getCurrentUser();
-            u = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(this.u).title(String.valueOf(FirebaseDatabase.getInstance().getReference().child("Users").child(user2.getUid()).child("name"))).icon(BitmapDescriptorFactory.defaultMarker())).setVisible(true);
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(u, 15.0f));
-
-        }else{
-            user = auth.getCurrentUser();
-            FirebaseDatabase.getInstance().getReference().child("Drivers").child(user.getUid()).child("lat").setValue(location.getLatitude());
-            FirebaseDatabase.getInstance().getReference().child("Drivers").child(user.getUid()).child("lng").setValue(location.getLongitude());
-
-            latLngCurrentuserLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(this.latLngCurrentuserLocation).icon(BitmapDescriptorFactory.fromResource(R.drawable.busicon))).setVisible(true);
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(this.latLngCurrentuserLocation, 15.0f));
-        }
-
+        FirebaseUser user2 = auth.getCurrentUser();
+        u = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(this.u).title(String.valueOf(FirebaseDatabase.getInstance().getReference().child("Users").child(user2.getUid()).child("name"))).icon(BitmapDescriptorFactory.defaultMarker())).setVisible(true);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(u, 15.0f));
     }
 
 

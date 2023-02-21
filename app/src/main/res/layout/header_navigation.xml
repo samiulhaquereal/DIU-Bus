@@ -24,7 +24,7 @@
         android:id="@+id/title_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Trash Collector Tracker"
+        android:text="@string/load"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="15sp"
         android:textStyle="bold" />
@@ -34,7 +34,7 @@
         android:layout_below="@+id/title_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="trashcollector47@gmail.com"
+        android:text="@string/load"
         android:textSize="16sp" />
     <TextView
         android:layout_below="@+id/email_text"
